@@ -1,0 +1,5 @@
+1、刷固件时，要选择factory.bin这个文件，千万不要选sysupgrade.bin这个文件！！！一定注意！！！sysupgrade.bin是刷好固件后，升级openwrt用的。
+
+2、刷机成功后，默认WiFi名称：Openwrt_5G ; Openwrt_2.4G 。 密码：无。
+
+3、这个固件的初始登陆ip是：192.168.6.1，密码是：password。

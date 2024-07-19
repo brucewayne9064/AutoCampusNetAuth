@@ -1,0 +1,6 @@
+openwrt官方原版系统：
+mtd -r write /tmp/openwrt-23.05.2-mediatek-mt7622-xiaomi_redmi-router-ax6s-squashfs-factory.bin  firmware
+
+
+另一个定制优化版：
+mtd -r write /tmp/factory.bin  firmware
