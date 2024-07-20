@@ -18,7 +18,7 @@
   - 原版：只能有线登录，配置复杂，系统纯净
   - 新手版：做好配置的版本
 
-在**telent命令**目录中，存放着在建立telnet连接后要执行的命令
+在**telent命令**目录中，存放着在建立telnet连接后要执行的命令。
 
 ### 1.2 刷机过程
 
@@ -69,11 +69,13 @@
 
 - 使用mtd命令刷机。
 
-  其中-r参数表示更新完自动重启。等待路由器黄灯变蓝灯。根据新手版的说明，刷机成功后，默认WiFi名称：Openwrt_5G ; Openwrt_2.4G 。 密码：无（但是Openwrt_2.4G好像有密码，不知道是多少）。这个固件的初始登陆ip是：192.168.6.1，密码是：password。
+  其中-r参数表示更新完自动重启。等待路由器黄灯变蓝灯。根据新手版的说明，刷机成功后，默认WiFi名称：Openwrt_5G ; Openwrt_2.4G 。 密码：无（但是Openwrt_2.4G好像有密码，不知道是多少）。这个固件的初始登陆ip是：192.168.6.1，密码是：password。再刷入upgrade.bin文件可以升级系统。
 
   ```shell
   mtd -r write /tmp/factory.bin firmware
   ```
+  
+  但是在这里遇到一点问题，就是刷入新系统之后安装openclash需要的依赖装不上，提示内核版本不对，还有就是ssh也出问题连不上，所以这里先考虑下一步刷回原厂系统，再重新来一次。
 
 
 - 刷回原厂系统
@@ -84,3 +86,30 @@
 刷的固件是ImmortalWRT。
 
 在网络-无线中可以修改wifi密码。
+
+我使用的vpn是这个[TAGInternet](https://tagss04.pro/#/home)，根据文档说明，应该是要使用[OpenClash插件](https://github.com/vernesong/OpenClash)安装在openwrt系统上。因为我ImmortalWrt的系统上搜索不到openclash，所以用ssh命令行安装，参考[这个教程](https://blog.hellowood.dev/posts/openwrt-%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8-openclash/)以及官方教程。
+
+OpenClash 依赖的是 `dnsmasq-full`，所以需要移除默认的`dnsmasq`，否则会导致 OpenClash 安装失败
+
+```bash
+opkg remove dnsmasq && opkg install dnsmasq-full
+```
+
+下载并安装 OpenClash
+
+可以在 [OpenClash](https://github.com/vernesong/OpenClash) 仓库的 [Release](https://github.com/vernesong/OpenClash/releases) 页面选择对应的版本进行下载
+
+```bash
+wget https://github.com/vernesong/OpenClash/releases/download/v0.45.35-beta/luci-app-openclash_0.45.35-beta_all.ipk -O openclash.ipk
+opkg update
+opkg install openclash.ipk
+```
+
+添加 `luci-compact` 并重启，否则会提示进入 luci 页面错误
+
+```bash
+opkg install luci luci-base luci-compat
+reboot
+```
+
+待重启完成后重新登录控制台，可以在服务菜单中看到 `OpenClash`
