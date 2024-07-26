@@ -1,6 +1,6 @@
 # AutoCampusNetAuth
 
-为了实现校园网自动登录验证以及路由器翻墙功能，参考[这篇文章](https://blog.csdn.net/m0_66984299/article/details/133325819)进行操作。路由器是红米AX6S，电脑用的是macos。
+为了实现校园网自动登录验证以及路由器翻墙功能，参考[这篇文章](https://blog.csdn.net/m0_66984299/article/details/133325819)进行操作。路由器是红米AX6S，电脑用的是一台macos和一台Windows。
 
 ## 1. 给路由器刷入openwrt
 
@@ -85,6 +85,8 @@
 
 ## 2.配置翻墙
 
+### 2.1 刷入的固件自带openclash
+
 OpenClash是一个运行在 OpenWrt 上的 Clash 客户端，兼容 Shadowsocks(R)、Vmess、Trojan、Snell 等协议，根据灵活的规则配置实现策略代理。参考[这个视频](https://www.youtube.com/watch?v=_U9uXhoyaeE)进行配置。我买的订阅是是[TAGInternet](https://tagss04.pro/#/home)的。
 
 - 选择配置文件订阅-添加
@@ -92,8 +94,43 @@ OpenClash是一个运行在 OpenWrt 上的 Clash 客户端，兼容 Shadowsocks(
 - 从机场复制订阅链接
 - 修改配置文件名-粘贴订阅地址
 - 保存配置-更新配置
-- 插件设置-版本更新-更新内核
+- 插件设置-版本更新-更新内核（根据[这个](https://www.youtube.com/watch?v=bVPp9HaxDLU&t=188s)设置成功的）
 - 显示主程序运行中即成功
 - 如果网站访问检查里面Youtube显示无法连接，说明订阅里面没有开启对应节点而是选择的direct
   - 代理模式选择规则。
   - 打开YACD控制面板或者DashBoard控制面板，然后把selecter选择为其他结点就行了。
+
+### 2.2 刷入的固件没有openclash（没有验证成功）
+
+ [OpenClash](https://github.com/vernesong/OpenClash) 的官方仓库中有详细的说明文档。大致来说分为以下几个步骤：
+
+> #安装依赖
+> * luci
+> * luci-base
+> * iptables
+> * dnsmasq-full
+> * coreutils
+> * coreutils-nohup
+> * bash
+> * curl
+> * jsonfilter
+> * ca-certificates
+> * ipset
+> * ip-full
+> * iptables-mod-tproxy
+> * kmod-tun(TUN模式)
+> * luci-compat(Luci-19.07)
+>
+> #上传IPK文件至您路由器的 /tmp 目录下
+>
+> #假设安装包名字为
+> luci-app-openclash_0.33.7-beta_all.ipk
+>
+> #执行安装命令
+> opkg install /tmp/luci-app-openclash_0.33.7-beta_all.ipk
+>
+> #执行卸载命令
+> #插件在卸载后会自动备份配置文件到 /tmp 目录下，除非路由器重启，在下次安装时将还原您的配置文件
+> opkg remove luci-app-openclash
+>
+> 安装完成后刷新LUCI页面，在菜单栏 -> 服务 -> OpenClash 进入插件页面
