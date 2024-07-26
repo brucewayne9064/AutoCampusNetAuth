@@ -4,7 +4,7 @@
 
 ## 1. 给路由器刷入openwrt
 
-参考[这位大佬的视频](https://www.youtube.com/watch?v=VkyIEuk6V5k)完成刷机。
+参考[这位大佬的视频](https://www.youtube.com/watch?v=VkyIEuk6V5k)完成刷机，第一次刷好后发现他的固件没有openclash，但是我自己又装不上，所以又找其他教程。这个youtuber的[视频](https://www.youtube.com/watch?v=V0rZ26Rhhd4)里的固件是有openssh的，**所以最后采用他的固件**，前面的步骤和第一位一样。
 
 ### 1.1 准备工具
 
@@ -67,49 +67,33 @@
 
   **最终发现Termius或者XFTP都不能用sftp协议建立连接，所以最后还是只能找了台Windows，用MobaXterm把文件上传到tmp目录。**
 
-- 使用mtd命令刷机。
+- 使用mtd命令刷机，第一次刷入的叫做底包。
 
-  其中-r参数表示更新完自动重启。等待路由器黄灯变蓝灯。根据新手版的说明，刷机成功后，默认WiFi名称：Openwrt_5G ; Openwrt_2.4G 。 密码：无（但是Openwrt_2.4G好像有密码，不知道是多少）。这个固件的初始登陆ip是：192.168.6.1，密码是：password。再刷入upgrade.bin文件可以升级系统。
+  其中-r参数表示更新完自动重启。等待路由器黄灯变蓝灯。根据新手版的说明，刷机成功后，默认WiFi名称：Openwrt_5G ; Openwrt_2.4G 。 密码：无（但是Openwrt_2.4G好像有密码，不知道是多少）。这个固件的初始登陆ip是：192.168.6.1，密码是：password。再刷入upgrade.bin文件（第二次刷入的叫升级包）可以升级系统(选择不保留配置)。升级的系统自带的功能变多了。
 
   ```shell
   mtd -r write /tmp/factory.bin firmware
   ```
   
-  但是在这里遇到一点问题，就是刷入新系统之后安装openclash需要的依赖装不上，提示内核版本不对，还有就是ssh也出问题连不上，所以这里先考虑下一步刷回原厂系统，再重新来一次。
+  但是在这里遇到一点问题，就是刷入新系统之后安装openclash需要的依赖装不上，提示内核版本不对，还有就是ssh也出问题连不上，所以这里先考虑下一步刷回原厂系统，再重新来一次，使用前面说的另一个版本固件。
 
 
 - 刷回原厂系统
-  - 这一步没有细看
+  - 准备两个工具，在[官网](https://www.miwifi.com/miwifi_download.html)可以找到，分别是小米路由器修复工具和AX6S官方固件。
+  - 关闭Windows防火墙和病毒保护。
+  - **路由器连接网线到电脑**，根据软件提示进行操作 ，选择对应的网口，然后写入文件，然后按住复位按钮，拔掉电源再插上，直到橙灯闪烁，松开复位键即可。
 
 ## 2.配置翻墙
 
-刷的固件是ImmortalWRT。
+OpenClash是一个运行在 OpenWrt 上的 Clash 客户端，兼容 Shadowsocks(R)、Vmess、Trojan、Snell 等协议，根据灵活的规则配置实现策略代理。参考[这个视频](https://www.youtube.com/watch?v=_U9uXhoyaeE)进行配置。我买的订阅是是[TAGInternet](https://tagss04.pro/#/home)的。
 
-在网络-无线中可以修改wifi密码。
+- 选择配置文件订阅-添加
 
-我使用的vpn是这个[TAGInternet](https://tagss04.pro/#/home)，根据文档说明，应该是要使用[OpenClash插件](https://github.com/vernesong/OpenClash)安装在openwrt系统上。因为我ImmortalWrt的系统上搜索不到openclash，所以用ssh命令行安装，参考[这个教程](https://blog.hellowood.dev/posts/openwrt-%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8-openclash/)以及官方教程。
-
-OpenClash 依赖的是 `dnsmasq-full`，所以需要移除默认的`dnsmasq`，否则会导致 OpenClash 安装失败
-
-```bash
-opkg remove dnsmasq && opkg install dnsmasq-full
-```
-
-下载并安装 OpenClash
-
-可以在 [OpenClash](https://github.com/vernesong/OpenClash) 仓库的 [Release](https://github.com/vernesong/OpenClash/releases) 页面选择对应的版本进行下载
-
-```bash
-wget https://github.com/vernesong/OpenClash/releases/download/v0.45.35-beta/luci-app-openclash_0.45.35-beta_all.ipk -O openclash.ipk
-opkg update
-opkg install openclash.ipk
-```
-
-添加 `luci-compact` 并重启，否则会提示进入 luci 页面错误
-
-```bash
-opkg install luci luci-base luci-compat
-reboot
-```
-
-待重启完成后重新登录控制台，可以在服务菜单中看到 `OpenClash`
+- 从机场复制订阅链接
+- 修改配置文件名-粘贴订阅地址
+- 保存配置-更新配置
+- 插件设置-版本更新-更新内核
+- 显示主程序运行中即成功
+- 如果网站访问检查里面Youtube显示无法连接，说明订阅里面没有开启对应节点而是选择的direct
+  - 代理模式选择规则。
+  - 打开YACD控制面板或者DashBoard控制面板，然后把selecter选择为其他结点就行了。
