@@ -134,3 +134,13 @@ OpenClash是一个运行在 OpenWrt 上的 Clash 客户端，兼容 Shadowsocks(
 > opkg remove luci-app-openclash
 >
 > 安装完成后刷新LUCI页面，在菜单栏 -> 服务 -> OpenClash 进入插件页面
+
+## 3. 校园网自动登录
+
+### 3.1 抓取登录链接
+
+### 3.2 两种自动登录实现思路
+
+### 3.3 定时重启自动登录网页认证功能
+
+### 3.4 自动检测并登录功能
